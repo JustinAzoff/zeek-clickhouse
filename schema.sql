@@ -15,6 +15,9 @@ CREATE TABLE if not exists logs
 	"bool.names"	Array(LowCardinality(String)),
 	"bool.values"	Array(UInt8),
 
+	"array.names"	Array(LowCardinality(String)),
+	"array.values"	Array(Array(String)),
+
 	//Materialized fields
 	ts		DateTime DEFAULT FROM_UNIXTIME(toUInt64(_timestamp/1000)),
 	day		Date DEFAULT toDate(FROM_UNIXTIME(toUInt64(_timestamp/1000))),

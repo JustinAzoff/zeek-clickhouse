@@ -35,40 +35,50 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var (
-		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare(`
+	tx, err := connect.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+	stmt, err := tx.Prepare(`
 			INSERT INTO logs (
 				_timestamp, _path, _hostname, _source,
 				"string.names", "string.values",
 				"number.names", "number.values",
-				"bool.names", "bool.values"
+				"bool.names", "bool.values",
+				"array.names", "array.values"
 			) VALUES (
 				?, ?, ?, ?,
 				?, ?,
 				?, ?,
+				?, ?,
 				?, ?
 			)`)
-	)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer stmt.Close()
 
 	var string_names []string
 	var number_names []string
 	var bool_names []string
+	var array_names []string
 
 	var string_values []string
 	var number_values []float64
 	var bool_values []bool
+	var array_values [][]string
 
 	br := bufio.NewReaderSize(os.Stdin, 16*1024*1024)
 	for {
 		string_names = string_names[:0]
 		number_names = number_names[:0]
 		bool_names = bool_names[:0]
+		array_names = array_names[:0]
 
 		string_values = string_values[:0]
 		number_values = number_values[:0]
 		bool_values = bool_values[:0]
+		array_values = array_values[:0]
 
 		line, err := br.ReadSlice('\n')
 		if err != nil {
@@ -112,6 +122,13 @@ func main() {
 					log.Fatal(err) //FIXME
 				}
 				bool_values = append(bool_values, val)
+			case jsonparser.Array:
+				array_names = append(array_names, string(key))
+				var items []string
+				jsonparser.ArrayEach(value, func(nestedvalue []byte, dataType jsonparser.ValueType, offset int, err error) {
+					items = append(items, string(nestedvalue))
+				})
+				array_values = append(array_values, items)
 			default:
 				log.Printf("Don't handle: Key: '%s' Value: '%s' Type: %s", string(key), string(value), dataType)
 			}
@@ -120,6 +137,7 @@ func main() {
 		//log.Printf("Strings: %v %v", string_names, string_values)
 		//log.Printf("numbers: %v %v", number_names, number_values)
 		//log.Printf("bools: %v %v", bool_names, bool_values)
+		log.Printf("arrays: %v %v", array_names, array_values)
 		if _, err := stmt.Exec(
 			ts_millis,
 			path,
@@ -131,6 +149,8 @@ func main() {
 			clickhouse.Array(number_values),
 			clickhouse.Array(bool_names),
 			clickhouse.Array(bool_values),
+			clickhouse.Array(array_names),
+			clickhouse.Array(array_values),
 		); err != nil {
 			log.Fatal(err)
 		}
