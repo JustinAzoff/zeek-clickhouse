@@ -2,7 +2,7 @@ CREATE TABLE logs
 (
 	_timestamp	UInt64,
 	_path		String,
-	hostname	String,
+	_hostname	String,
 
 	//raw log event
 	_source		String,
@@ -16,6 +16,8 @@ CREATE TABLE logs
 	"bool.values"	Array(UInt8),
 
 	//Materialized fields
+	ts		DateTime DEFAULT FROM_UNIXTIME(toUInt64(_timestamp/1000)),
+	day		Date DEFAULT toDate(FROM_UNIXTIME(toUInt64(_timestamp/1000))),
 	uid		String DEFAULT "string.values"[indexOf("string.names", 'uid')]
 	//id.orig_h	String,
 	//id.orig_p	UInt16,
@@ -25,4 +27,4 @@ CREATE TABLE logs
 ENGINE = MergeTree()
 ORDER BY (_timestamp, cityHash64(uid))
 SAMPLE BY (cityHash64(uid))
-PARTITION BY (toYYYYMM(FROM_UNIXTIME(_timestamp)), _path);
+PARTITION BY (toYYYYMM(FROM_UNIXTIME(toUInt64(_timestamp/1000))), _path);
