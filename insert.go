@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"database/sql"
 	_ "embed"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,7 +19,11 @@ import (
 var schema string
 
 func main() {
-	connect, err := sql.Open("clickhouse", "tcp://192.168.2.68:9000?debug=false")
+	var uri string
+	flag.StringVar(&uri, "uri", "tcp://192.168.2.68:9000?debug=false", "server uri")
+	flag.Parse()
+
+	connect, err := sql.Open("clickhouse", uri)
 	if err != nil {
 		log.Fatal(err)
 	}
