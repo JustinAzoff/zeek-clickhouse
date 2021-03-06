@@ -137,7 +137,7 @@ func main() {
 		//log.Printf("Strings: %v %v", string_names, string_values)
 		//log.Printf("numbers: %v %v", number_names, number_values)
 		//log.Printf("bools: %v %v", bool_names, bool_values)
-		log.Printf("arrays: %v %v", array_names, array_values)
+		//log.Printf("arrays: %v %v", array_names, array_values)
 		if _, err := stmt.Exec(
 			ts_millis,
 			path,
