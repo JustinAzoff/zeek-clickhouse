@@ -18,7 +18,7 @@ import (
 var schema string
 
 func main() {
-	connect, err := sql.Open("clickhouse", "tcp://192.168.2.68:9000?debug=true")
+	connect, err := sql.Open("clickhouse", "tcp://192.168.2.68:9000?debug=false")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,9 +117,9 @@ func main() {
 			}
 			return nil
 		})
-		log.Printf("Strings: %v %v", string_names, string_values)
-		log.Printf("numbers: %v %v", number_names, number_values)
-		log.Printf("bools: %v %v", bool_names, bool_values)
+		//log.Printf("Strings: %v %v", string_names, string_values)
+		//log.Printf("numbers: %v %v", number_names, number_values)
+		//log.Printf("bools: %v %v", bool_names, bool_values)
 		if _, err := stmt.Exec(
 			ts_millis,
 			path,
