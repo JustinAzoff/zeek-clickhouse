@@ -37,6 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 	br := bufio.NewReaderSize(os.Stdin, 16*1024*1024)
+	n := 0
 	for {
 		line, err := br.ReadSlice('\n')
 		if err != nil {
@@ -48,18 +49,30 @@ func main() {
 			log.Printf("Error Converting: %s: %v", line, err)
 			continue
 		}
-		//log.Printf("Strings: %v %v", string_names, string_values)
-		//log.Printf("numbers: %v %v", number_names, number_values)
-		//log.Printf("bools: %v %v", bool_names, bool_values)
-		//log.Printf("arrays: %v %v", array_names, array_values)
 		err = inserter.Insert(rec)
 		if err != nil {
 			log.Printf("Error inserting: %v: %v", rec, err)
 			continue
 		}
+		n++
+		if n%100000 == 0 {
+			log.Printf("Comitting %d records", n)
+			n = 0
+			if err := inserter.Commit(); err != nil {
+				log.Fatal(err)
+			}
+			err = inserter.Begin()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
 	}
 
-	if err := inserter.Commit(); err != nil {
-		log.Fatal(err)
+	if n > 0 {
+		log.Printf("Comitting %d records", n)
+		if err := inserter.Commit(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
