@@ -28,6 +28,6 @@ CREATE TABLE if not exists logs
 	"id.resp_p"	String DEFAULT "number.values"[indexOf("number.names", 'id.resp_p')]
 )
 ENGINE = MergeTree()
-ORDER BY (_timestamp, uid, cityHash64(uid))
+ORDER BY (_timestamp, _path, uid, cityHash64(uid))
 SAMPLE BY (cityHash64(uid))
 PARTITION BY (toYYYYMM(FROM_UNIXTIME(toUInt64(_timestamp/1000))), _path);
