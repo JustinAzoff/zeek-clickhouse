@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,6 +13,17 @@ import (
 
 	zeekclickhouse "github.com/JustinAzoff/zeek-clickhouse"
 )
+
+var beginning = []byte(`"event":`)
+
+func extractEvent(message []byte) ([]byte, error) {
+	//Should probably just use jsonparser here, but I know the structure
+	start := bytes.Index(message, []byte(beginning))
+	if start == -1 {
+		return message, errors.New("Can't find start of event")
+	}
+	return message[start+len(beginning) : len(message)-1], nil
+}
 
 type HECClickhouse struct {
 	ch   *zeekclickhouse.Inserter
@@ -25,6 +38,28 @@ func NewHECClickhouse(URI string) (*HECClickhouse, error) {
 	return &HECClickhouse{
 		ch: inserter,
 	}, nil
+}
+func (h *HECClickhouse) doInsert(records []zeekclickhouse.DBRecord) error {
+	var err error
+	h.lock.Lock()
+	defer h.lock.Unlock()
+
+	err = h.ch.Begin()
+	if err != nil {
+		return fmt.Errorf("Error starting tx: %w", err)
+	}
+
+	for _, rec := range records {
+		err = h.ch.Insert(rec)
+		if err != nil {
+			return fmt.Errorf("Error inserting : %w", err)
+		}
+	}
+	err = h.ch.Commit()
+	if err != nil {
+		return fmt.Errorf("Error commiting : %w", err)
+	}
+	return nil
 }
 
 func (h *HECClickhouse) Ingest(w http.ResponseWriter, req *http.Request) {
@@ -42,42 +77,26 @@ func (h *HECClickhouse) Ingest(w http.ResponseWriter, req *http.Request) {
 	log.Printf("Got %d lines", count)
 	records := make([]zeekclickhouse.DBRecord, 0, count)
 	for _, line := range splitIntoLines {
-		rec, err := zeekclickhouse.ZeekToDBRecord(line)
+		zeek, err := extractEvent(line)
+		if err != nil {
+			log.Printf("Error extracting event: %v", err)
+			continue
+		}
+		rec, err := zeekclickhouse.ZeekToDBRecord(zeek)
 		if err != nil {
 			log.Printf("Error converting record: %v", err)
-		} else {
-			records = append(records, rec)
+			continue
 		}
+		records = append(records, rec)
 	}
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	err = h.doInsert(records)
 
-	err = h.ch.Begin()
 	if err != nil {
-		log.Printf("Error starting tx: %v", err)
+		log.Printf("Error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"text":"Failure","code":503}` + "\n"))
 		return
 	}
-
-	for _, rec := range records {
-		err = h.ch.Insert(rec)
-		if err != nil {
-			log.Printf("Error inserting: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"text":"Failure","code":503}` + "\n"))
-			return
-		}
-	}
-	err = h.ch.Commit()
-	if err != nil {
-		log.Printf("Error committing tx: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"text":"Failure","code":503}` + "\n"))
-		return
-	}
-	h.lock.Unlock()
-
 	w.Write([]byte(`{"text":"Success","code":0}` + "\n"))
 }
 
