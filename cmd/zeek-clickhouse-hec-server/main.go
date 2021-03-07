@@ -35,6 +35,10 @@ func NewHECClickhouse(URI string) (*HECClickhouse, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = inserter.LoadSchema()
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &HECClickhouse{
 		ch: inserter,
 	}, nil
@@ -117,10 +121,6 @@ func main() {
 	}
 
 	hec, err := NewHECClickhouse(uri)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = inserter.LoadSchema()
 	if err != nil {
 		log.Fatal(err)
 	}
