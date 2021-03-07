@@ -120,6 +120,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = inserter.LoadSchema()
+	if err != nil {
+		log.Fatal(err)
+	}
 	myHandler.HandleFunc("/ingest", hec.Ingest)
 	log.Printf("Listening on %s\n", bindAddr)
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
