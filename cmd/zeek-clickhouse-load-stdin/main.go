@@ -13,7 +13,9 @@ import (
 
 func main() {
 	var uri string
+	var batchSize int
 	flag.StringVar(&uri, "uri", "tcp://192.168.2.68:9000?debug=false", "server uri")
+	flag.IntVar(&batchSize, "batchsize", 100_000, "commit batch size")
 	flag.Parse()
 
 	inserter, err := zeekclickhouse.NewInserter(uri)
@@ -55,7 +57,7 @@ func main() {
 			continue
 		}
 		n++
-		if n%100000 == 0 {
+		if n%batchSize == 0 {
 			log.Printf("Comitting %d records", n)
 			n = 0
 			if err := inserter.Commit(); err != nil {
