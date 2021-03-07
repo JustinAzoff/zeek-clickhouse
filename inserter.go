@@ -41,19 +41,19 @@ func (i *Inserter) Begin() error {
 		return err
 	}
 	stmt, err := tx.Prepare(`
-			INSERT INTO logs (
-				_timestamp, _path, _hostname, _source,
-				"string.names", "string.values",
-				"number.names", "number.values",
-				"bool.names", "bool.values",
-				"array.names", "array.values"
-			) VALUES (
-				?, ?, ?, ?,
-				?, ?,
-				?, ?,
-				?, ?,
-				?, ?
-			)`)
+		INSERT INTO logs (
+			_timestamp, _path, _hostname, _source,
+			"string.names", "string.values",
+			"number.names", "number.values",
+			"bool.names", "bool.values",
+			"array.names", "array.values"
+		) VALUES (
+			?, ?, ?, ?,
+			?, ?,
+			?, ?,
+			?, ?,
+			?, ?
+		)`)
 	if err != nil {
 		return err
 	}
