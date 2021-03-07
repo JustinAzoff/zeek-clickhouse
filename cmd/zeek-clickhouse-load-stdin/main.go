@@ -58,7 +58,7 @@ func main() {
 		}
 		n++
 		if n%batchSize == 0 {
-			log.Printf("Comitting %d records", n)
+			log.Printf("Committing %d records", n)
 			n = 0
 			if err := inserter.Commit(); err != nil {
 				log.Fatal(err)
@@ -72,7 +72,7 @@ func main() {
 	}
 
 	if n > 0 {
-		log.Printf("Comitting %d records", n)
+		log.Printf("Committing %d records", n)
 		if err := inserter.Commit(); err != nil {
 			log.Fatal(err)
 		}
