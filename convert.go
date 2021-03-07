@@ -22,13 +22,13 @@ func ZeekToDBRecord(line []byte) (DBRecord, error) {
 	if err == nil {
 		rec.Hostname = hostname
 	}
-	ts, err := jsonparser.GetString(line, "ts")
+	ts, err := jsonparser.GetUnsafeString(line, "ts")
 	if err != nil {
 		return rec, fmt.Errorf("Invalid record %q, missing ts", line)
 	}
 	t, err := time.Parse("2006-01-02T15:04:05.000000Z", ts)
 	if err != nil {
-		log.Fatal(err) //FIXME
+		return rec, fmt.Errorf("Failed to parse timestamp %s: %v", ts, err)
 	}
 	rec.Timestamp = t.UnixNano() / 1e6
 	err = jsonparser.ObjectEach(line, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
