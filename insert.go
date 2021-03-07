@@ -77,18 +77,11 @@ func main() {
 		//log.Printf("bools: %v %v", bool_names, bool_values)
 		//log.Printf("arrays: %v %v", array_names, array_values)
 		if _, err := stmt.Exec(
-			rec.Timestamp,
-			rec.Path,
-			rec.Hostname,
-			line,
-			clickhouse.Array(rec.string_names),
-			clickhouse.Array(rec.string_values),
-			clickhouse.Array(rec.number_names),
-			clickhouse.Array(rec.number_values),
-			clickhouse.Array(rec.bool_names),
-			clickhouse.Array(rec.bool_values),
-			clickhouse.Array(rec.array_names),
-			clickhouse.Array(rec.array_values),
+			rec.Timestamp, rec.Path, rec.Hostname, line,
+			clickhouse.Array(rec.string_names), clickhouse.Array(rec.string_values),
+			clickhouse.Array(rec.number_names), clickhouse.Array(rec.number_values),
+			clickhouse.Array(rec.bool_names), clickhouse.Array(rec.bool_values),
+			clickhouse.Array(rec.array_names), clickhouse.Array(rec.array_values),
 		); err != nil {
 			log.Fatal(err)
 		}
