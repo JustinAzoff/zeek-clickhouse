@@ -15,6 +15,7 @@ func ZeekToDBRecord(line []byte) (DBRecord, error) {
 	if err != nil {
 		return rec, fmt.Errorf("Invalid record %q, missing _path", line)
 	}
+	rec.Source = string(line)
 	rec.Path = path
 
 	hostname, err := jsonparser.GetString(line, "_system_name")

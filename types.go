@@ -4,7 +4,7 @@ type DBRecord struct {
 	Timestamp int64
 	Path      string
 	Hostname  string
-	//Source    string
+	Source    string
 
 	string_names  []string
 	string_values []string
