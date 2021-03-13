@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	z := NewZeekTSVReader(os.Stdin)
+	z := zeekclickhouse.NewZeekTSVReader(os.Stdin)
 	n := 0
 	for {
 		rec, err := z.Next()
