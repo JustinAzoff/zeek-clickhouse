@@ -1,7 +1,9 @@
 package zeekclickhouse
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 	"time"
@@ -68,4 +70,24 @@ func ZeekToDBRecord(line []byte) (DBRecord, error) {
 		return nil
 	})
 	return rec, err
+}
+
+type ZeekJSONReader struct {
+	r *bufio.Reader
+}
+
+func (z *ZeekJSONReader) Next() (DBRecord, error) {
+	var rec DBRecord
+	line, err := z.r.ReadSlice('\n')
+	if err != nil {
+		return rec, err
+	}
+	return ZeekToDBRecord(line)
+}
+
+func NewZeekJSONReader(r io.Reader) *ZeekJSONReader {
+	br := bufio.NewReaderSize(r, 16*1024*1024)
+	return &ZeekJSONReader{
+		r: br,
+	}
 }

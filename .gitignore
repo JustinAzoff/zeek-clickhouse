@@ -1,3 +1,2 @@
 cmd/zeek-clickhouse-hec-server/zeek-clickhouse-hec-server
 cmd/zeek-clickhouse-load-stdin/zeek-clickhouse-load-stdin
-cmd/zeek-clickhouse-load-tsv/zeek-clickhouse-load-tsv

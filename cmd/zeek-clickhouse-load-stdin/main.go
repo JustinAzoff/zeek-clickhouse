@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -14,6 +13,8 @@ import (
 func main() {
 	var uri string
 	var batchSize int
+	var format string
+	flag.StringVar(&format, "format", "json", "json or csv")
 	flag.StringVar(&uri, "uri", "tcp://192.168.2.68:9000?debug=false", "server uri")
 	flag.IntVar(&batchSize, "batchsize", 100_000, "commit batch size")
 	flag.Parse()
@@ -38,18 +39,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	br := bufio.NewReaderSize(os.Stdin, 16*1024*1024)
+	var z zeekclickhouse.DBConverter
+	switch format {
+	case "tsv":
+		z = zeekclickhouse.NewZeekTSVReader(os.Stdin)
+	case "json":
+		z = zeekclickhouse.NewZeekJSONReader(os.Stdin)
+	default:
+		log.Fatalf("Invalid format: %v. Not tsv or json", format)
+	}
 	n := 0
 	for {
-		line, err := br.ReadSlice('\n')
+		rec, err := z.Next()
 		if err != nil {
-			log.Printf("ReadSlice: %v", err)
+			log.Printf("Next: %v", err)
 			break
-		}
-		rec, err := zeekclickhouse.ZeekToDBRecord(line)
-		if err != nil {
-			log.Printf("Error Converting: %s: %v", line, err)
-			continue
 		}
 		err = inserter.Insert(rec)
 		if err != nil {
