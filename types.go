@@ -18,3 +18,7 @@ type DBRecord struct {
 	array_names  []string
 	array_values [][]string
 }
+
+type DBConverter interface {
+	Next() (DBRecord, error)
+}
