@@ -1,0 +1,10 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	http
+#open	2021-03-13-11-01-13
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	trans_depth	method	host	uri	referrer	version	user_agent	origin	request_body_len	response_body_len	status_code	status_msg	info_code	info_msg	tags	username	password	proxied	orig_fuids	orig_filenames	orig_mime_types	resp_fuids	resp_filenames	resp_mime_types
+#types	time	string	addr	port	addr	port	count	string	string	string	string	string	string	string	count	count	count	string	count	string	set[enum]	string	string	set[string]	vector[string]	vector[string]	vector[string]	vector[string]	vector[string]	vector[string]
+1389719056.899932	CtzNEOAu9XflFepEg	10.0.2.15	55127	192.150.187.43	80	1	GET	bro.org	/download/CHANGES.binpac.txt	http://bro.org/download/index.html	1.1	Mozilla/5.0 (X11; Linux i686; rv:24.0) Gecko/20100101 Firefox/24.0	-	0	3912	200	OK	-	-	(empty)	-	-	-	-	-	-	Fwy0p54cZCKE34pDQd	-	text/plain
+#close	2021-03-13-11-01-13
