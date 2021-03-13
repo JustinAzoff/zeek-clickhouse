@@ -90,10 +90,10 @@ func (z *ZeekTSVReader) Next() (DBRecord, error) {
 			rec.Timestamp = int64(nval * 1000)
 		}
 		switch ftype {
-		case "uid", "string", "addr", "proto":
+		case "uid", "string", "addr", "enum":
 			rec.string_names = append(rec.string_names, fname)
 			rec.string_values = append(rec.string_values, val)
-		case "time", "port", "count", "duration":
+		case "time", "port", "count", "interval":
 			nval, err := strconv.ParseFloat(string(val), 64)
 			if err != nil {
 				return rec, err
