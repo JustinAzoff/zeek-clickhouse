@@ -76,7 +76,7 @@ func (z *ZeekTSVReader) Next() (DBRecord, error) {
 		}
 		fname = z.fields[i]
 		ftype = z.types[i]
-		if strings.HasPrefix(ftype, "vector") {
+		if strings.HasPrefix(ftype, "vector") || strings.HasPrefix(ftype, "set") {
 			vval := strings.Split(val, z.setSeparator)
 			rec.array_names = append(rec.array_names, fname)
 			rec.array_values = append(rec.array_values, vval)
