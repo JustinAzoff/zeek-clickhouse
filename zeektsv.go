@@ -62,8 +62,12 @@ func (z *ZeekTSVReader) Next() (DBRecord, error) {
 			z.fields = parts[1:]
 		case "#types":
 			z.types = parts[1:]
+		case "#open":
+		//do nothing
+		case "#close":
+		//do nothing
 		default:
-			log.Printf("It's a header line: %s", line)
+			log.Printf("unhandled header line: %s", line)
 		}
 		return z.Next()
 	}
