@@ -88,6 +88,6 @@ func main() {
 
 	if totalRecords > 0 {
 		duration := time.Since(startTime)
-		log.Printf("Inserted %d records in %.1f seconds, %d records/sec", totalRecords, duration.Seconds(), float64(totalRecords)/duration.Seconds())
+		log.Printf("Inserted %d records in %.1f seconds, %.0f records/sec", totalRecords, duration.Seconds(), float64(totalRecords)/duration.Seconds())
 	}
 }
