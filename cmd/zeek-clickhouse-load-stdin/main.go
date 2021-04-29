@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
-	"github.com/ClickHouse/clickhouse-go"
+	clickhouse "github.com/ClickHouse/clickhouse-go"
 	zeekclickhouse "github.com/JustinAzoff/zeek-clickhouse"
 )
 
@@ -49,6 +50,8 @@ func main() {
 		log.Fatalf("Invalid format: %v. Not tsv or json", format)
 	}
 	n := 0
+	totalRecords := 0
+	startTime := time.Now()
 	for {
 		rec, err := z.Next()
 		if err != nil {
@@ -61,6 +64,7 @@ func main() {
 			continue
 		}
 		n++
+		totalRecords++
 		if n%batchSize == 0 {
 			log.Printf("Committing %d records", n)
 			n = 0
@@ -80,5 +84,10 @@ func main() {
 		if err := inserter.Commit(); err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	if totalRecords > 0 {
+		duration := time.Since(startTime)
+		log.Printf("Inserted %d records in %.1f seconds, %d records/sec", totalRecords, duration.Seconds(), float64(totalRecords)/duration.Seconds())
 	}
 }
