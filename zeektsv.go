@@ -97,7 +97,7 @@ func (z *ZeekTSVReader) Next() (DBRecord, error) {
 		case "uid", "string", "addr", "enum":
 			rec.string_names = append(rec.string_names, fname)
 			rec.string_values = append(rec.string_values, val)
-		case "time", "port", "count", "interval", "double":
+		case "time", "port", "count", "interval", "double", "int":
 			nval, err := strconv.ParseFloat(string(val), 64)
 			if err != nil {
 				return rec, err
